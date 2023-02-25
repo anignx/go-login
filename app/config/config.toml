@@ -1,0 +1,15 @@
+[server]
+    service_name="go-login"
+    port = 10006
+
+[log]
+    level="info"
+    logpath="logs"
+    rotate="hour"
+    business_log_off=true
+    succ_stat_code=[499,1601001,1601002,1062,1601003,1605001]
+
+[[database]]
+    name="go-login"
+    master="root:123456@tcp(localhost:3306)/go-login?collation=utf8mb4_general_ci&loc=Asia%2FShanghai&parseTime=true&timeout=10s&readTimeout=5s&writeTimeout=5s"
+    slaves=["root:123456@tcp(localhost:3306)/go-login?collation=utf8mb4_general_ci&loc=Asia%2FShanghai&parseTime=true&timeout=10s&readTimeout=5s&writeTimeout=5s"]

@@ -1,0 +1,15 @@
+go 1.18
+
+use (
+	./app
+	./conf
+	./dao
+	./package
+	./package/BackendPlatform/gec
+	./package/BackendPlatform/logging
+	./package/config
+	./package/daenerys
+	./package/daenerys/proxy
+	./server
+	./service
+)
