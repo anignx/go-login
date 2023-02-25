@@ -12,4 +12,5 @@ use (
 	./package/daenerys/proxy
 	./server
 	./service
+	./util
 )
