@@ -13,3 +13,17 @@
     name="go-login"
     master="root:123456@tcp(localhost:3306)/go-login?collation=utf8mb4_general_ci&loc=Asia%2FShanghai&parseTime=true&timeout=10s&readTimeout=5s&writeTimeout=5s"
     slaves=["root:123456@tcp(localhost:3306)/go-login?collation=utf8mb4_general_ci&loc=Asia%2FShanghai&parseTime=true&timeout=10s&readTimeout=5s&writeTimeout=5s"]
+
+[[redis]]
+    server_name="login"
+    addr="localhost:6379"
+    password=""
+    max_idle=100
+    max_active=100
+    idle_timeout=5000
+    connect_timeout=300
+    read_timeout=200
+    write_timeout=200
+    slow_time=200
+    retry=1
+    database=0

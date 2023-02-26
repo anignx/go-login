@@ -127,7 +127,7 @@ type DaenerysConfig struct {
 	ServerClient []ServerClient `toml:"server_client"`
 	// KafkaConsume        []kafka.KafkaConsumeConfig `toml:"kafka_consume"`
 	// KafkaProducerClient []kafkaProducerItem        `toml:"kafka_producer_client"`
-	Redis    []redisConfig    `toml:"redis"`
+	Redis    []RedisConfig    `toml:"redis"`
 	Database []SQLGroupConfig `toml:"database"`
 	// ESCfg               []es.Config                `toml:"es"`
 	Circuit   []CircuitConfig     `toml:"circuit"`
@@ -146,7 +146,7 @@ type kafkaProducerItem struct {
 }
 
 // golang包中的redis是json格式,此处转为toml格式
-type redisConfig struct {
+type RedisConfig struct {
 	ServerName     string `toml:"server_name"`
 	Addr           string `toml:"addr"`
 	Password       string `toml:"password"`

@@ -62,6 +62,7 @@ func (s *Service) UserRegister(c *gin.Context) (*RegisterResponse, error) {
 }
 
 func (s *Service) UserLogout(c *gin.Context) (interface{}, error) {
+	s.dao.TestRedis()
 	return struct{}{}, nil
 }
 

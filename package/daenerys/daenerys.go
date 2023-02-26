@@ -14,6 +14,7 @@ const TimeFormat = "2006-01-02 15:04:05.999"
 type Daenerys struct {
 	initOnce     sync.Once
 	mysqlClients sync.Map
+	redisClients sync.Map
 	ConfigPath   string
 	Namespace    string
 	App          string
@@ -57,9 +58,9 @@ func (d *Daenerys) initMiddleware() error {
 	// kafkaConsumerInit := func() error {
 	// 	return d.InitKafkaConsume(d.config.KafkaConsume)
 	// }
-	// redisClientInit := func() error {
-	// 	return d.InitRedisClient(d.redisConfig())
-	// }
+	redisClientInit := func() error {
+		return d.InitRedisClient(config.Conf.Redis)
+	}
 	mysqlClientInit := func() error {
 		return d.InitSqlClient(config.Conf.Database)
 	}
@@ -70,7 +71,7 @@ func (d *Daenerys) initMiddleware() error {
 	middlewares := map[string]func() error{
 		// "kafkaProducerInit": kafkaProducerInit,
 		// "kafkaConsumerInit": kafkaConsumerInit,
-		// "redisClientInit":   redisClientInit,
+		"redisClientInit": redisClientInit,
 		"mysqlClientInit": mysqlClientInit,
 		// "esClientInit":      esClientInit,
 	}
