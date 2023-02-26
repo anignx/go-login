@@ -24,10 +24,17 @@ func (d *Dao) GetUserByID(userId uint) (*User, error) {
 	return user, err
 }
 
+func (d *Dao) GetUserByIphone(iPhone string) (*User, error) {
+	logging.Logger.Infof("get user by iphone: %s", iPhone)
+	user := &User{}
+	err := d.db.Master().Table("user").Where("iphone = ?", iPhone).First(user).Error
+	return user, err
+}
+
 // CreateUser 创建用户
-func (d *Dao) CreateUser(user *User, identityType int, credential string) (int, error) {
+func (d *Dao) CreateUser(user *User, identityType int, credential string) (uint, error) {
 	logging.Logger.Infof("create user: %v", user)
-	var userId int
+	var userId uint
 	tx := d.db.Master().Begin()
 	defer func() {
 		if err := recover(); err != nil {
@@ -66,5 +73,5 @@ func (d *Dao) CreateUser(user *User, identityType int, credential string) (int, 
 		return userId, err
 	}
 	logging.Logger.Infof("create user_status success: new ID:%d", UserStatus.ID)
-	return int(user.ID), tx.Commit().Error
+	return uint(user.ID), tx.Commit().Error
 }

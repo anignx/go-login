@@ -76,10 +76,8 @@ func _iphoneSms(args []*string) (_err error) {
 	return _err
 }
 
-func PushIphoneSms(iphone string, signName string, tempCode string, tempParam string) {
+func PushIphoneSms(iphone string, signName string, tempCode string, tempParam string) error {
 	strMap := []string{iphone, signName, tempCode, tempParam}
 	err := _iphoneSms(tea.StringSlice(strMap))
-	if err != nil {
-		panic(err)
-	}
+	return err
 }

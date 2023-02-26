@@ -7,16 +7,18 @@ import (
 )
 
 type Dao struct {
-	c     *conf.Config
-	db    *proxy.SQL
-	redis redis.Conn
+	c         *conf.Config
+	db        *proxy.SQL
+	redis     redis.Conn
+	loginCode redis.Conn
 }
 
 func New(c *conf.Config) *Dao {
 	return &Dao{
-		c:     c,
-		db:    proxy.InitSQL("go-login"),
-		redis: proxy.RedisClient("login"),
+		c:         c,
+		db:        proxy.InitSQL("go-login"),
+		redis:     proxy.RedisClient("login"),
+		loginCode: proxy.RedisClient("login-code"),
 	}
 }
 

@@ -17,4 +17,6 @@ func initRouter(s *gin.Engine) {
 	s.GET("/login", login)
 	s.GET("/register", register)
 	s.GET("/logout", logout)
+	s.GET("/gettoken", gettoken)
+	s.GET("/getuserinfo", getuserinfo)
 }

@@ -1,6 +1,8 @@
 package service
 
 import (
+	"encoding/gob"
+
 	"my.service/go-login/conf"
 	"my.service/go-login/dao"
 )
@@ -11,10 +13,13 @@ type Service struct {
 }
 
 func New(conf *conf.Config) *Service {
-	return &Service{
+	s := &Service{
 		c:   conf,
 		dao: dao.New(conf),
 	}
+
+	gob.Register(SessionInfo{})
+	return s
 }
 
 func (s *Service) Close() {

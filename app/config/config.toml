@@ -27,3 +27,17 @@
     slow_time=200
     retry=1
     database=0
+
+[[redis]]
+    server_name="login-code"
+    addr="localhost:6379"
+    password=""
+    max_idle=100
+    max_active=100
+    idle_timeout=5000
+    connect_timeout=300
+    read_timeout=200
+    write_timeout=200
+    slow_time=200
+    retry=1
+    database=1

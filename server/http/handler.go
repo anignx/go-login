@@ -31,12 +31,36 @@ func register(c *gin.Context) {
 	gec.Success(data).JSON(c)
 }
 
+func gettoken(c *gin.Context) {
+	data, err := svc.GetToken(c)
+	if err != nil {
+		logging.Logger.Infof("gettoken failed: %v", err)
+		c.JSON(200, gin.H{
+			"message": "gettoken failed",
+		})
+		return
+	}
+	gec.Success(data).JSON(c)
+}
+
 func logout(c *gin.Context) {
 	data, err := svc.UserLogout(c)
 	if err != nil {
 		logging.Logger.Infof("logout failed: %v", err)
 		c.JSON(200, gin.H{
 			"message": "logout failed",
+		})
+		return
+	}
+	gec.Success(data).JSON(c)
+}
+
+func getuserinfo(c *gin.Context) {
+	data, err := svc.GetUserInfo(c)
+	if err != nil {
+		logging.Logger.Infof("getuserinfo failed: %v", err)
+		c.JSON(200, gin.H{
+			"message": "getuserinfo failed",
 		})
 		return
 	}

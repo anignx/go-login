@@ -3,6 +3,8 @@ package http
 import (
 	"fmt"
 
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	"my.service/go-login/conf"
 	"my.service/go-login/package/BackendPlatform/ginhandle"
@@ -24,6 +26,10 @@ func Init(service *service.Service, conf *conf.Config) {
 	r = gin.Default()
 	r.Use(ginhandle.GinLogger())
 	r.Use(ginhandle.GinRecovery(true))
+
+	// session配置
+	store := cookie.NewStore([]byte("go-login"))
+	r.Use(sessions.Sessions("SESSIONID", store))
 
 	initRouter(r)
 	port := fmt.Sprintf(":%d", myconfig.Conf.Server.Port)
