@@ -9,6 +9,7 @@ use (
 	./package/BackendPlatform/logging
 	./package/config
 	./package/daenerys
+	./package/daenerys/etcd
 	./package/daenerys/proxy
 	./server
 	./service

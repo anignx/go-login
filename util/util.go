@@ -3,6 +3,7 @@ package util
 import (
 	"crypto/md5"
 	"encoding/hex"
+	"net"
 )
 
 const (
@@ -24,4 +25,21 @@ func Md5(str string) string {
 	h := md5.New()
 	h.Write([]byte(str))
 	return hex.EncodeToString(h.Sum(nil))
+}
+
+// GetLocalIP 获取本机IP
+func GetLocalIP() ([]string, error) {
+	ret := []string{}
+	addrs, err := net.InterfaceAddrs()
+	if err != nil {
+		return ret, err
+	}
+	for _, a := range addrs {
+		if ipnet, ok := a.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
+			if ipnet.IP.To4() != nil {
+				ret = append(ret, ipnet.IP.String())
+			}
+		}
+	}
+	return ret, err
 }

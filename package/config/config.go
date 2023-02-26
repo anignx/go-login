@@ -73,8 +73,8 @@ type DaenerysConfig struct {
 		ServiceName string   `toml:"service_name"`
 		Port        int      `toml:"port"`
 		Tags        []string `toml:"server_tags"`
-
-		TCP struct {
+		App         string   `toml:"app"`
+		TCP         struct {
 			IdleTimeout      int `toml:"idle_timeout"`
 			KeepliveInterval int `toml:"keeplive_interval"`
 		} `toml:"tcp"`

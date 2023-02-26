@@ -1,6 +1,7 @@
 [server]
     service_name="go-login"
     port = 10006
+    app = "app"
 
 [log]
     level="info"
@@ -41,3 +42,21 @@
     slow_time=200
     retry=1
     database=1
+
+[[server_client]]
+    service_name="social.strategy.tag"
+    proto="http"
+    endpoints_from="consul"
+    balancetype="roundrobin"
+    read_timeout=1000
+    retry_times=1
+    slow_time = 200
+
+[[server_client]]
+	service_name="social.profile.base"
+	proto="http"
+	endpoints_from="consul"
+	balancetype="roundrobin"
+	read_timeout=500
+	retry_times=0
+    slow_time =200
