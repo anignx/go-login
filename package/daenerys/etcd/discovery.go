@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"log"
+
+	"strings"
 	"sync"
 	"time"
 
@@ -14,10 +16,12 @@ import (
 
 //ServiceDiscovery 服务发现
 type ServiceDiscovery struct {
-	cli        *clientv3.Client  //etcd client
-	serverList map[string]string //服务列表
-	lock       sync.Mutex
-	myService  map[string]struct{} //本服务名称
+	cli          *clientv3.Client  //etcd client
+	serverList   map[string]string //服务列表
+	lock         sync.Mutex
+	myService    map[string]struct{} //本服务名称
+	serviceMap   map[string]map[string]string
+	LoadBanlance map[string]interface{} // 负载均衡算法
 }
 
 //NewServiceDiscovery  新建发现服务
@@ -71,10 +75,25 @@ func (s *ServiceDiscovery) watcher(prefix string, watchStartRevision int64) {
 }
 
 //SetServiceList 新增服务地址
+// map[/buzz/app/go-login/leimingdeAir:127.0.0.1:10006 /buzz/app/go-login/newService:172.0.0.1:10007 /buzz/app/go-login/newService3:172.0.0.1:10008 /buzz/app/go-login/newService4:172.0.0.1:10009 /buzz/app/go-login/newService5:172.0.0.1:10000 /buzz/app/go-login/newService6:172.0.0.1:10001 /buzz/app/go-login/newService7:172.0.0.1:33]
 func (s *ServiceDiscovery) SetServiceList(key, val string) {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 	s.serverList[key] = string(val)
+
+	// 加入到对应的负载均衡器中
+	name := GetNameSpaceName(key)
+	if name == "" {
+		return
+	}
+	if _, ok := s.LoadBanlance[name]; !ok {
+		return
+	}
+
+	switch s.LoadBanlance[name].(type) {
+	case *RandomBalance:
+		s.LoadBanlance[name].(*RandomBalance).Add(val)
+	}
 	log.Println("put key :", key, "val:", val)
 }
 
@@ -82,6 +101,21 @@ func (s *ServiceDiscovery) SetServiceList(key, val string) {
 func (s *ServiceDiscovery) DelServiceList(key string) {
 	s.lock.Lock()
 	defer s.lock.Unlock()
+
+	// 加入到对应的负载均衡器中
+	name := GetNameSpaceName(key)
+	if name == "" {
+		return
+	}
+	if _, ok := s.LoadBanlance[name]; !ok {
+		return
+	}
+
+	switch s.LoadBanlance[name].(type) {
+	case *RandomBalance:
+		s.LoadBanlance[name].(*RandomBalance).Remove(s.serverList[key])
+	}
+
 	delete(s.serverList, key)
 	log.Println("del key:", key)
 }
@@ -99,6 +133,14 @@ func (s *ServiceDiscovery) GetServices() []string {
 	return addrs
 }
 
+func GetNameSpaceName(serviceName string) string {
+	tmp := strings.Split(serviceName, "/")
+	if len(tmp) < 4 {
+		return ""
+	}
+	return tmp[1] + "." + tmp[2] + "." + tmp[3]
+}
+
 //Close 关闭服务
 func (s *ServiceDiscovery) Close() error {
 	return s.cli.Close()
@@ -106,9 +148,38 @@ func (s *ServiceDiscovery) Close() error {
 
 func (s *ServiceDiscovery) InitMyService() {
 	s.myService = make(map[string]struct{})
+	// map[buzz.app.go-login:{} buzz.app.go-user:{}]
+	load := make(map[string]interface{})
 	for _, v := range config.Conf.ServerClient {
+		// 重复配置检查
+		if _, ok := s.myService[v.ServiceName]; ok {
+			continue
+		}
 		s.myService[v.ServiceName] = struct{}{}
+
+		// 新的负载均衡配置可以在这里添加
+		switch v.Balancetype {
+		case Random:
+			load[v.ServiceName] = &RandomBalance{}
+		}
 	}
+
+	s.LoadBanlance = load
+}
+
+// 获取当前config所关注的所有服务发现地址
+func (s *ServiceDiscovery) GetServicesMap() map[string]map[string]string {
+	serviceMap := make(map[string]map[string]string)
+	onceMap := make(map[string]string)
+	for k, v := range s.serverList {
+		tmp := strings.Split(k, "/")
+		newServiceName := GetNameSpaceName(k)
+		if _, ok := s.myService[newServiceName]; ok {
+			onceMap[tmp[4]] = v
+			serviceMap[newServiceName] = onceMap
+		}
+	}
+	return serviceMap
 }
 
 func InitDiscovery() *ServiceDiscovery {
@@ -119,14 +190,8 @@ func InitDiscovery() *ServiceDiscovery {
 
 	// 监听的是服务的前置,该服务下的所有服务都会被监听,也会被修改
 	_ = ser.WatchService("/buzz")
-	go func() {
-		for {
-			select {
-			case <-time.Tick(10 * time.Second):
-				log.Println(ser.GetServices())
-			}
-		}
-	}()
+
+	ser.serviceMap = ser.GetServicesMap()
 	return ser
 }
 

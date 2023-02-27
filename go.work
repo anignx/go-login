@@ -4,12 +4,14 @@ use (
 	./app
 	./conf
 	./dao
+	./manager
 	./package
 	./package/BackendPlatform/gec
 	./package/BackendPlatform/logging
 	./package/config
 	./package/daenerys
 	./package/daenerys/etcd
+	./package/daenerys/http
 	./package/daenerys/proxy
 	./server
 	./service

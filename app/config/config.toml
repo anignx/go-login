@@ -44,7 +44,7 @@
     database=1
 
 [[server_client]]
-    service_name="social.strategy.tag"
+    service_name="buzz.app.go-login"
     proto="http"
     endpoints_from="consul"
     balancetype="roundrobin"
@@ -53,7 +53,7 @@
     slow_time = 200
 
 [[server_client]]
-	service_name="social.profile.base"
+	service_name="buzz.app.go-user"
 	proto="http"
 	endpoints_from="consul"
 	balancetype="roundrobin"
